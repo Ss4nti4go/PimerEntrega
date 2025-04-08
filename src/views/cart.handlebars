@@ -1,0 +1,242 @@
+<style>
+    .cart-container {
+    max-width: 800px;
+    margin: 50px auto;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cart-container h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.cart-container ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cart-container li {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cart-container li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cart-container li strong {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    flex: 2;
+}
+
+.cart-container li .item-details {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-container p {
+    text-align: right;
+    font-size: 1.3rem;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+}
+
+.cart-empty {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 40px 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.cart-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.continue-shopping {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.continue-shopping:hover {
+    background: white;
+    color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-btn {
+    background: white;
+    color: var(--primary-color);
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-btn:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive para el carrito */
+@media (max-width: 768px) {
+    .cart-container {
+        padding: 30px 20px;
+        margin: 30px 15px;
+    }
+    
+    .cart-container h1 {
+        font-size: 2rem;
+    }
+    
+    .cart-container li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .cart-container li strong {
+        margin-bottom: 10px;
+    }
+    
+    .cart-container li .item-details {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .cart-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .continue-shopping, .checkout-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+<div class="cart-container">
+  <h1>Tu Carrito</h1>
+
+  {{#if products.length}}
+    <ul>
+      {{#each products}}
+        <li>
+          <strong>{{this.title}}</strong>
+          <div class="item-details">
+            <span>Cantidad: {{this.quantity}}</span>
+            <span>Precio: ${{this.price}}</span>
+            <span>Total: ${{this.total}}</span>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+    <p>Total: ${{this.absTotal}}</p>
+    
+    <div class="cart-actions">
+      <a href="/" class="continue-shopping">Seguir comprando</a>
+     <button id="btn-comprar" class="checkout-btn">Finalizar compra</button>
+    </div>
+  {{else}}
+    <p class="cart-empty">Tu carrito está vacío.</p>
+    <div class="cart-actions">
+      <a href="/" class="continue-shopping">Ir a la tienda</a>
+    </div>
+  {{/if}}
+</div>
+<script>
+  document.getElementById('btn-comprar').addEventListener('click', async () => {
+    const cartId = "{{cart_id}}";
+
+    try {
+      const response = await fetch(`/api/cart/${cartId}/purchase`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+        
+
+    if (response.ok) {
+  const data = await response.json();
+
+  // Crear el cartel de confirmación
+  const mensaje = document.createElement("div");
+  mensaje.textContent = "✅ ¡Compra realizada con éxito! Se ha enviado un correo de confirmación.";
+  mensaje.style.backgroundColor = "#d4edda";
+  mensaje.style.color = "#155724";
+  mensaje.style.padding = "1rem";
+  mensaje.style.margin = "1rem auto";
+  mensaje.style.border = "1px solid #c3e6cb";
+  mensaje.style.borderRadius = "5px";
+  mensaje.style.textAlign = "center";
+  mensaje.style.fontSize = "1.1rem";
+  mensaje.style.width = "80%";
+
+  // Agregarlo al body o a un contenedor específico
+  document.body.prepend(mensaje); // o usar appendChild donde quieras
+
+  // Redirigir después de unos segundos
+  setTimeout(() => {
+    window.location.href = "/cart";
+  }, 3000); // espera 3 segundos
+} else {
+  const err = await response.json();
+  console.error("Error en la compra:", err.message);
+
+  // Mostrar mensaje de error en el DOM
+  const errorMsg = document.createElement("div");
+  errorMsg.textContent = `❌ Error: ${err.message}`;
+  errorMsg.style.backgroundColor = "#f8d7da";
+  errorMsg.style.color = "#721c24";
+  errorMsg.style.padding = "1rem";
+  errorMsg.style.margin = "1rem auto";
+  errorMsg.style.border = "1px solid #f5c6cb";
+  errorMsg.style.borderRadius = "5px";
+  errorMsg.style.textAlign = "center";
+  errorMsg.style.fontSize = "1.1rem";
+  errorMsg.style.width = "80%";
+
+  document.body.prepend(errorMsg);
+}
+    } catch (error) {
+          console.error("Error al realizar la compra:", error);
+      alert("Ocurrió un error inesperado");
+    
+    }
+  });
+</script>

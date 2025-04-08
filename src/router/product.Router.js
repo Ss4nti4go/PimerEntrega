@@ -1,23 +1,30 @@
-import { Router } from 'express';
-import  productModel  from '../models/product.models.js';
+import express from 'express';
+import ProductController from '../controllers/products.controller.js';
+import authorization from '../middlewares/authorization.middleware.js';
+import passportCall from '../middlewares/passportCall.js';
 
-const router = Router()
+const router = express.Router();
 
-router.get('/', async (req, res) => {
+const {
+    getProduct,
+    getProducts,
+    createProduct,
+    updateProduct,
+    deleteProduct
+} = new ProductController();
+// Ruta para obtener todos los productos
+router.get('/', getProducts);
 
-    const products = await productModel.find();
-    res.send(products)
-})
-router.post('/' , async (req, res) => {
-    const { body } = req;
-    const result = await productModel.create(body);
-    res.send(result)
-})
-router.put('/' , (req, res) => {
-    res.send('put product')
-})
-router.delete('/' , (req, res) => {
-    res.send('delete product')
-})
+// Ruta para obtener un producto por id
+router.get('/:pid', getProduct);
 
-export default router
+// Ruta para crear un nuevo producto
+router.post('/',passportCall('jwt'),authorization('admin') ,createProduct);
+
+// Ruta para actualizar un producto existente
+router.put('/:pid',passportCall('jwt'),authorization('admin'),updateProduct);
+
+// Ruta para eliminar un producto
+router.delete('/:pid',passportCall('jwt'), authorization('admin'),deleteProduct);
+
+export default router;

@@ -1,18 +1,24 @@
 import { Router } from 'express';
+import CartController from '../controllers/cart.controller.js';
 
-const router = Router()
+const router = Router();
+const {
+    getCart,
+    addProduct,
+    purchaseCart,
+    clearCart
+} = new CartController();
 
-router.get('/', (req, res) => {
-    res.send('get carts')
-})
-router.post('/' , (req, res) => {
-    res.send('post cart')
-})
-router.put('/' , (req, res) => {
-    res.send('put cart')
-})
-router.delete('/' , (req, res) => {
-    res.send('delete cart')
-})
+// Obtener un carrito
+router.get('/:cid', getCart);
 
-export default router
+// Agregar un producto al carrito
+router.post('/:cid/product/:pid', addProduct);
+
+// Realizar la compra del carrito
+router.post('/:cid/purchase', purchaseCart);
+
+// Vaciar el carrito
+router.delete('/:cid', clearCart);
+
+export default router;

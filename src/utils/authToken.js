@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
+import configObject from '../config/process.config.js';
 
-export const PRIVATE_KEY = 'secretCoder';
+export const PRIVATE_KEY = configObject.sessionSecret;
 
 export const generateToken = userData => {
     const token = jwt.sign(userData, PRIVATE_KEY, {expiresIn: '1d'});
